@@ -1,0 +1,27 @@
+Resources:
+  ElbDns:
+    Condition: HasElbDomainName
+    Properties:
+      Comment: DNS for ELB in ${AWS::StackName}
+      HostedZoneName:
+        Fn::Sub: ${ElbDomainName}.
+      RecordSets:
+        - AliasTarget:
+            DNSName:
+              Fn::GetAtt: Elb.DNSName
+            EvaluateTargetHealth: true
+            HostedZoneId:
+              Fn::GetAtt: Elb.CanonicalHostedZoneID
+          Name:
+            Fn::Sub: '${ElbDomainName}.'
+          Type: A
+        - AliasTarget:
+            DNSName:
+              Fn::GetAtt: Elb.DNSName
+            EvaluateTargetHealth: true
+            HostedZoneId:
+              Fn::GetAtt: Elb.CanonicalHostedZoneID
+          Name:
+            Fn::Sub: '*.${ElbDomainName}.'
+          Type: A
+    Type: AWS::Route53::RecordSetGroup
